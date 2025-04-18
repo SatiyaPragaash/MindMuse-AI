@@ -28,9 +28,44 @@ resource "aws_lambda_function" "mindmuse_lambda" {
   environment {
     variables = {
       BUCKET_NAME     = aws_s3_bucket.pdf_bucket.bucket
-      GEMINI_API_KEY  = "AIzaSyDMs0knGlKCyZ-PmPSF5v-T2PsBvcnalYQ"
+      GEMINI_API_KEY  = ""
     }
   }
+}
+
+resource "aws_cloudwatch_log_metric_filter" "lambda_error_filter" {
+  name           = "LambdaErrorMetricFilter"
+  log_group_name = "/aws/lambda/${aws_lambda_function.mindmuse_lambda.function_name}"
+  pattern        = "ERROR"
+
+  metric_transformation {
+    name      = "LambdaErrorCount"
+    namespace = "MindMuseApp"
+    value     = "1"
+  }
+}
+
+resource "aws_sns_topic" "lambda_alert_topic" {
+  name = "lambda-error-alerts"
+}
+
+resource "aws_sns_topic_subscription" "lambda_email_alert" {
+  topic_arn = aws_sns_topic.lambda_alert_topic.arn
+  protocol  = "email"
+  endpoint  = "satiyapragaash32@gmail.com"
+}
+
+resource "aws_cloudwatch_metric_alarm" "lambda_error_alarm" {
+  alarm_name          = "LambdaErrorAlarm"
+  comparison_operator = "GreaterThanOrEqualToThreshold"
+  evaluation_periods  = 1
+  metric_name         = "LambdaErrorCount"
+  namespace           = "MindMuseApp"
+  period              = 60
+  statistic           = "Sum"
+  threshold           = 1
+  alarm_description   = "Triggers when Lambda logs contain 'ERROR'"
+  alarm_actions       = [aws_sns_topic.lambda_alert_topic.arn]
 }
 
 resource "aws_apigatewayv2_api" "mindmuse_api" {
