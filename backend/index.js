@@ -57,6 +57,10 @@ exports.handler = async (event) => {
   const mood = body?.mood || "okay";
   console.log("📥 Mood received:", mood);
 
+  if (mood === "TriggerError") {
+    throw new Error(" ERROR : Simulated error for CloudWatch test");
+  }
+  
   const prompt = `I feel ${mood} today. Please generate a personalized mental wellness guide for me that includes:
 - 2 journaling prompts
 - 1 breathing exercise
@@ -76,7 +80,7 @@ Make it friendly, supportive, and easy to follow.`;
     guideText = response.data.candidates[0].content.parts[0].text;
     console.log("Gemini response received.");
   } catch (error) {
-    console.error("Error calling Gemini API:", error.message);
+    console.error("ERROR: calling Gemini API:", error.message);
   }
 
   const filename = `wellness_guide_${Date.now()}.pdf`;
@@ -101,7 +105,7 @@ Make it friendly, supportive, and easy to follow.`;
         resolve();
       });
       stream.on("error", (err) => {
-        console.error("PDF generation error:", err.message);
+        console.error("PDF generation ERROR:", err.message);
         reject(err);
       });
     });
@@ -156,7 +160,7 @@ Make it friendly, supportive, and easy to follow.`;
     };
 
   } catch (err) {
-    console.error("Error during PDF or S3/DynamoDB process:", err.message);
+    console.error("ERROR during PDF or S3/DynamoDB process:", err.message);
     return {
       statusCode: 500,
       headers: {

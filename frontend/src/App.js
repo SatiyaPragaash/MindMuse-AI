@@ -1,14 +1,13 @@
 import React, { useState } from "react";
 
-const MOODS = ["Hyperactive", "Anxious", "Tired", "Stressed", "Lonely"];
+const MOODS = ["Hyperactive", "Anxious", "Tired", "Stressed", "Lonely", "TriggerError"];
 
 const App = () => {
   const [selectedMoods, setSelectedMoods] = useState([]);
   const [loading, setLoading] = useState(false);
   const [pdfUrl, setPdfUrl] = useState("");
   const [error, setError] = useState("");
-
-  const [logs, setLogs] = useState([]); // 🟩 for displaying DynamoDB logs
+  const [logs, setLogs] = useState([]); // 🟩 For displaying DynamoDB logs
   const [showLogs, setShowLogs] = useState(false); // 🟩 toggle
 
   const API_URL = process.env.REACT_APP_API_URL;
@@ -50,7 +49,7 @@ const App = () => {
     setLoading(false);
   };
 
-  // 🟩 New: Fetch logs from DynamoDB
+  //Fetch logs from DynamoDB
   const handleFetchLogs = async () => {
     setShowLogs(true);
     try {
@@ -87,7 +86,6 @@ const App = () => {
         {loading ? "Generating Guide..." : "Generate My Wellness Guide"}
       </button>
 
-      {/* 🟩 Button to show logs */}
       <button onClick={handleFetchLogs} style={{ marginLeft: "1rem" }}>
         Show Recent Logs
       </button>
@@ -102,7 +100,6 @@ const App = () => {
         </p>
       )}
 
-      {/* 🟩 Logs display section */}
       {showLogs && logs.length > 0 && (
         <div style={{ marginTop: 20 }}>
           <h3>📋 Recent Mood Logs</h3>
